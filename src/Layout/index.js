@@ -1,16 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import NotFound from './NotFound';
 import Home from '../Home';
 import Study from '../Study';
-import CreateDeck from '../Deck/CreateDeck';
-import EditDeck from '../Deck/EditDeck';
-import DeckScreen from '../Deck/DeckScreen';
-import AddCard from '../Deck/Cards/AddCard';
-import EditCard from '../Deck/Cards/EditCard';
+import CreateDeck from './Decks/CreateDeck';
+import EditDeck from './Decks/EditDeck';
+import DeckScreen from './Decks/DeckScreen';
+import AddCard from './Cards/AddCard';
+import EditCard from './Cards/EditCard';
 import { Switch, Route } from 'react-router-dom';
+import { listDecks } from '../utils/api';
 
 function Layout() {
+  const [decks, setDecks] = useState([]);
+
+  useEffect(() => {
+    async function allDecks() {
+      const everyDeck = await listDecks();
+      setDecks(everyDeck);
+    }
+    allDecks();
+  }, []);
+
+  const initialDeckForm = {
+    title: 'Deck Name',
+    inputTitle: 'Name',
+    inputDescript: 'Description',
+  };
+
   return (
     <>
       <Header />
@@ -18,7 +35,7 @@ function Layout() {
         {/* TODO: Implement the screen starting here */}
         <Switch>
           <Route path="/" exact>
-            <Home />
+            <Home decks={decks} />
           </Route>
           <Route path={'/decks/:deckId/study'}>
             <Study />

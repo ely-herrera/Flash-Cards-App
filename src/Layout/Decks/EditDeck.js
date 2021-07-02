@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import DeckForm from './DeckForm';
-import { readDeck, updateDeck } from '../utils/api/index';
+import { readDeck, updateDeck } from '../../utils/api/index';
 
 function EditDeck() {
   const initialFormState = {

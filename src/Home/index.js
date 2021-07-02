@@ -1,41 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { listDecks, deleteDeck } from '../utils/api';
+import { deleteDeck } from '../utils/api';
 import { Link, useRouteMatch } from 'react-router-dom';
 
-function Home() {
-  const [deck, setDeck] = useState([]);
-  const { url } = useRouteMatch();
+function Home({ decks }) {
+  // async function handleDelete(id) {
+  //   const msgConfirmation = window.confirm(
+  //     'Are you sure you want to delete this deck? You will not be able to recover it'
+  //   );
 
-  useEffect(() => {
-    const abortController = new AbortController();
+  //   if (msgConfirmation) {
+  //     await deleteDeck(id);
+  //     setDecks((deck) => deck.filter((decks) => decks.id !== id));
+  //   }
+  // }
 
-    async function loadDeck() {
-      try {
-        const deckData = await listDecks();
-        setDeck(deckData);
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log('Aborted');
-        } else throw error;
-      }
-    }
-    loadDeck();
-    return () => abortController.abort();
-  }, []);
-  console.log(deck);
-
-  async function handleDelete(id) {
-    const msgConfirmation = window.confirm(
-      'Are you sure you want to delete this deck? You will not be able to recover it'
-    );
-
-    if (msgConfirmation) {
-      await deleteDeck(id);
-      setDeck((deck) => deck.filter((decks) => decks.id !== id));
-    }
-  }
-
-  const deckList = deck.map(({ name, description, cards, id }) => (
+  const deckList = decks.map(({ name, description, cards, id }) => (
     <section key={id} className="card ">
       <div className="card-body">
         <div className="row">
@@ -57,7 +36,7 @@ function Home() {
           <div className="col-2">
             <button
               className="btn btn-danger mx-2 text"
-              onClick={() => handleDelete(id)}
+              // onClick={() => handleDelete(id)}
             >
               <span className="oi oi-trash" />
             </button>

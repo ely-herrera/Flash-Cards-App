@@ -5,7 +5,7 @@ import {
   deleteDeck,
   deleteCard,
   listCards,
-} from '../utils/api/index';
+} from '../../utils/api/index';
 
 function DeckScreen() {
   const [deck, setDeck] = useState([]);
