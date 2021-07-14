@@ -1,59 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Header from './Header';
 import NotFound from './NotFound';
-import Home from '../Home';
-import Study from '../Study';
-import CreateDeck from './Decks/CreateDeck';
-import EditDeck from './Decks/EditDeck';
-import DeckScreen from './Decks/DeckScreen';
-import AddCard from './Cards/AddCard';
-import EditCard from './Cards/EditCard';
-import { Switch, Route } from 'react-router-dom';
-import { listDecks } from '../utils/api';
+import ListDeck from './Decks/ListDeck';
+import DeckForm from './Decks/DeckForm';
+import DeckInfo from './Decks/DeckInfo';
+import { Switch, Route, Link } from 'react-router-dom';
 
 function Layout() {
-  const [decks, setDecks] = useState([]);
-
-  useEffect(() => {
-    async function allDecks() {
-      const everyDeck = await listDecks();
-      setDecks(everyDeck);
-    }
-    allDecks();
-  }, []);
-
   const initialDeckForm = {
     title: 'Deck Name',
     inputTitle: 'Name',
     inputDescript: 'Description',
+    submitType: 'newDeck',
   };
 
   return (
     <>
       <Header />
       <div className="container">
-        {/* TODO: Implement the screen starting here */}
         <Switch>
-          <Route path="/" exact>
-            <Home decks={decks} />
+          <Route exact path="/">
+            <ListDeck />
           </Route>
-          <Route path={'/decks/:deckId/study'}>
-            <Study />
+          <Route exact path="/decks/new">
+            <nav>
+              <ol className="breadcrumb">
+                <li className="breadcrumb-item">
+                  <Link to="/">Home</Link>
+                </li>
+                <li className="breadcrumb-item active">Create Deck</li>
+              </ol>
+            </nav>
+            <DeckForm formProps={initialDeckForm} />
           </Route>
-          <Route path={'/decks/new'}>
-            <CreateDeck />
-          </Route>
-          <Route path={'/decks/:deckId/cards/:cardId/edit'}>
-            <EditCard />
-          </Route>
-          <Route path={'/decks/:deckId/cards/new'}>
-            <AddCard />
-          </Route>
-          <Route path={'/decks/:deckId/edit'}>
-            <EditDeck />
-          </Route>
-          <Route path={'/decks/:deckId'}>
-            <DeckScreen />
+          <Route path="/decks/:deckId">
+            <DeckInfo />
           </Route>
           <Route>
             <NotFound />

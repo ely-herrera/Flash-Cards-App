@@ -1,34 +1,116 @@
-import React from 'react';
-function DeckForm({ formData, changeHandler }) {
+import React, { useEffect, useState } from 'react';
+import { useRouteMatch, useHistory } from 'react-router-dom';
+import { createDeck, readDeck, updateDeck } from '../../utils/api';
+
+function DeckForm({ formProps: { title, input, description, submitType } }) {
+  const {
+    url,
+    params: { deckId },
+  } = useRouteMatch();
+  const [deck, setDeck] = useState({});
+  const history = useHistory();
+
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    async function getDeck() {
+      try {
+        const response = await readDeck(deckId);
+        setDeck(response);
+        setFormData({
+          name: response.name,
+          description: response.description,
+        });
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log('Aborted', deckId);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    if (url !== '/decks/new') {
+      getDeck();
+    }
+
+    return () => {
+      abortController.abort();
+    };
+  }, [deckId, url]);
+
+  const initialFormState = {
+    name: deck.name ? deck.name : '',
+    description: deck.description ? deck.description : '',
+  };
+
+  const [formData, setFormData] = useState({ ...initialFormState });
+
+  const handleChange = ({ target }) => {
+    setFormData({
+      ...formData,
+      [target.name]: target.value,
+    });
+  };
+
+  const submitHandler = (event) => {
+    event.preventDefault();
+    if (submitType === 'editDeck') {
+      formData.id = deckId;
+    }
+    submitType === 'newDeck'
+      ? createDeck(formData).then((res) => {
+          history.push(`/decks/${res.id}`);
+        })
+      : updateDeck(formData).then((res) => {
+          history.push(`/decks/${res.id}`);
+        });
+  };
+
+  const handleCancel = (event) => {
+    event.preventDefault();
+    history.goBack();
+  };
+
   return (
-    <div className="form-row">
-      <div className="col-md-6 mb-3">
-        <label htmlFor="validationDefault01">Name:</label>
-        <input
-          className="form-control"
-          id="validationDefault01"
-          type="text"
-          name="name"
-          onChange={changeHandler}
-          value={formData.name}
-          placeholder="Deck Name"
-          required
-        />
-      </div>
-      <div className="col-md-6 mb-3">
-        <label htmlFor="validationDefault02">Description:</label>
-        <textarea
-          className="form-control"
-          id="validationDefault02"
-          type="text"
-          name="description"
-          onChange={changeHandler}
-          value={formData.description}
-          placeholder="Brief description of the deck"
-          required
-        />
-      </div>
-    </div>
+    <>
+      <h2>{title}</h2>
+      <form className="form-group" onSubmit={submitHandler}>
+        <div>
+          <label>
+            {input}
+            <input
+              name="name"
+              className="form-control"
+              type="text"
+              defaultValue={formData.name}
+              onChange={handleChange}
+              placeholder="Deck Name"
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            {description}
+            <textarea
+              name="description"
+              className="form-control"
+              defaultValue={formData.description}
+              onChange={handleChange}
+              placeholder="Brief description of the deck"
+            ></textarea>
+          </label>
+        </div>
+        <div>
+          <button className="btn btn-secondary" onClick={handleCancel}>
+            Cancel
+          </button>
+          <button className="btn btn-primary" type="submit">
+            Submit
+          </button>
+        </div>
+      </form>
+    </>
   );
 }
 

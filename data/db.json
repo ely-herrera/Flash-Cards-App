@@ -2,7 +2,7 @@
   "decks": [
     {
       "name": "React Route",
-      "description": "React Router is a collection of navigational components that compose declaratively with your application. ",
+      "description": "React Rouffter is a collection of navigational components that compose declaratively with your application. ",
       "id": 2
     },
     {
@@ -13,6 +13,11 @@
       "name": "a new deck ",
       "description": "Description ",
       "id": 3
+    },
+    {
+      "name": "f",
+      "description": "fadsfsdf",
+      "id": 4
     }
   ],
   "cards": [
@@ -46,18 +51,6 @@
       "back": "ba",
       "deckId": 3,
       "id": 8
-    },
-    {
-      "front": "wer",
-      "back": "wer",
-      "deckId": 3,
-      "id": 9
-    },
-    {
-      "front": "wer",
-      "back": "wea",
-      "deckId": 3,
-      "id": 10
     }
   ]
 }
