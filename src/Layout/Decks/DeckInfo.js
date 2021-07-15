@@ -1,118 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { Route, Switch, Link, useRouteMatch } from 'react-router-dom';
-import ListCard from '../Cards/ListCard';
-import Study from '../../Study';
-import DeckForm from './DeckForm';
+import { Link, Route } from 'react-router-dom';
+import { useHistory } from 'react-router';
 import Deck from './Deck';
-import CardForm from '../Cards/CardForm';
-import { readDeck } from '../../utils/api/index';
+import { deleteDeck } from '../../utils/api';
+import React from 'react';
 
-function DeckInfo() {
-  const [deck, setDeck] = useState({});
-  const {
-    params: { deckId },
-    path,
-    url,
-  } = useRouteMatch();
+/**
+ * To display deck information to allow notification of actions.
+ */
+function DeckInfo({ deck, deleteDck, setDeck }) {
+  const history = useHistory();
 
-  useEffect(getDeck, []);
+  // TODO: RB - centralize all deck functionality to Home/index.js
+  // Delete Card Prompt
+  function handleDelete() {
+    const confirmed = window.confirm(
+      'Deleted data cannot be recovered, do you want to continue?'
+    );
 
-  function getDeck() {
-    readDeck(deckId).then(setDeck);
+    if (confirmed) {
+      deleteDeck(deck.id).then(() => history.push('/decks/new'));
+    }
   }
-
-  const editDeckForm = {
-    title: 'Edit Deck',
-    input: 'Name',
-    description: 'Description',
-    submitType: 'editDeck',
-  };
-  const newCardForm = {
-    title: 'Add Card',
-    input: 'Front',
-    description: 'Back',
-    submitType: 'newCard',
-  };
-  const editCardForm = {
-    title: 'Edit Card',
-    input: 'Front',
-    description: 'Back',
-    submitType: 'editCard',
-  };
-
   return (
     <>
-      <Switch>
-        <Route exact path={`${path}`}>
-          <nav>
-            <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <Link to="/">Home</Link>
-              </li>
-              <li className="breadcrumb-item active">{deck.name}</li>
-            </ol>
-          </nav>
-          <Deck deck={deck} />
-          <h2>Cards</h2>
-          <ListCard deck={deck} />
-        </Route>
-        <Route path={`${path}/study`}>
-          <nav>
-            <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <Link to="/">Home</Link>
-              </li>
-              <li className="breadcrumb-item">
-                <Link to={`${url}`}>{deck.name}</Link>
-              </li>
-              <li className="breadcrumb-item active">Study</li>
-            </ol>
-          </nav>
-          <Study />
-        </Route>
-        <Route path={`${path}/edit`}>
-          <nav>
-            <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <Link to="/">Home</Link>
-              </li>
-              <li className="breadcrumb-item">
-                <Link to={`${url}`}>{deck.name}</Link>
-              </li>
-              <li className="breadcrumb-item active">Edit Deck</li>
-            </ol>
-          </nav>
-          <DeckForm formProps={editDeckForm} />
-        </Route>
-        <Route exact path={`${path}/cards/new`}>
-          <nav>
-            <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <Link to="/">Home</Link>
-              </li>
-              <li className="breadcrumb-item">
-                <Link to={`${url}`}>{deck.name}</Link>
-              </li>
-              <li className="breadcrumb-item active">Add Card</li>
-            </ol>
-          </nav>
-          <CardForm formProps={newCardForm} deck={deck} />
-        </Route>
-        <Route path={`${path}/cards/:cardId/edit`}>
-          <nav>
-            <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <Link to="/">Home</Link>
-              </li>
-              <li className="breadcrumb-item">
-                <Link to={`${url}`}>{deck.name}</Link>
-              </li>
-              <li className="breadcrumb-item active">Edit Card</li>
-            </ol>
-          </nav>
-          <CardForm formProps={editCardForm} deck={deck} />
-        </Route>
-      </Switch>
+      {/* There is a breadcrumb navigation bar with a link to home / followed by the name of the deck (e.g., Home/React Router). */}
+      <li className="list-group-item mb-4">
+        <div className="mb-2 justify-content-between d-flex">
+          <h3>{deck.name}</h3>
+          <div className="float-right">{deck.cards.length} cards</div>
+        </div>
+        <div className="mb-2"> {deck.description}</div>
+        <div>
+          <Link to={`/decks/${deck.id}`}>
+            <button className="btn btn-secondary mr-1">View</button>
+          </Link>
+          <Link to={`/decks/${deck.id}/study`}>
+            <button className="btn btn-primary mr-1">Study</button>
+          </Link>
+          {/*  has a “Delete” button that allows that card to be deleted. */}
+          <button onClick={handleDelete} className="btn btn-danger float-right">
+            Delete
+          </button>
+        </div>
+      </li>
+      <Route exact path={`/decks/${deck.id}`}>
+        <Deck deck={deck} setDeck={setDeck} />
+      </Route>
     </>
   );
 }

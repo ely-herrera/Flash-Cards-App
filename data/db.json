@@ -15,9 +15,14 @@
       "id": 3
     },
     {
-      "name": "f",
-      "description": "fadsfsdf",
+      "name": "New ",
+      "description": "Description",
       "id": 4
+    },
+    {
+      "name": "A new deck ",
+      "description": "whats up?",
+      "id": 5
     }
   ],
   "cards": [
@@ -51,6 +56,24 @@
       "back": "ba",
       "deckId": 3,
       "id": 8
+    },
+    {
+      "front": "another card",
+      "back": "Back of card ",
+      "deckId": 4,
+      "id": 9
+    },
+    {
+      "front": "front",
+      "back": "Back",
+      "deckId": 4,
+      "id": 10
+    },
+    {
+      "front": "hello",
+      "back": "goodbye",
+      "deckId": 4,
+      "id": 11
     }
   ]
 }

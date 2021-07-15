@@ -1,124 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams, useHistory } from 'react-router-dom';
-import { readDeck } from '../utils/api/index';
+import React, { useEffect, useState } from 'react';
+import { useParams, useHistory, Link } from 'react-router-dom';
+import { readDeck } from '../utils/api';
+import FlipCard from './FlipCard';
+import StudyView from './StudyView';
 
 function Study() {
   const { deckId } = useParams();
+  const [deck, setDeck] = useState({ name: 'Loading...', cards: [] });
+  const [cardNumber, setCardNumber] = useState(1);
 
-  console.log(deckId);
-  const [cardFront, setCardFront] = useState(true);
-  const [cardAmount, setCardAmount] = useState(0);
-  const [cards, setCards] = useState([]);
-  const [deck, setDeck] = useState([]);
-
-  useEffect(() => {
-    setCards({});
-    const abortController = new AbortController();
-    async function loadData() {
-      try {
-        const data = await readDeck(deckId, abortController.signal);
-        setDeck(data);
-        setCards(data.cards);
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log('Aborted!');
-        } else throw error;
-      }
-    }
-    loadData();
-    return () => abortController.abort();
-  }, [deckId]);
-
-  function cardFlip() {
-    setCardFront(!cardFront);
-  }
   const history = useHistory();
 
-  function cardSwitch() {
-    if (cardAmount + 1 < cards.length) {
-      setCardAmount(cardAmount + 1);
-      setCardFront(true);
-    } else {
-      const windowMsg = window.confirm(`Restart cards?
-      
-      Click "cancel" to return to the home page. `);
-      if (windowMsg) {
-        setCardAmount(0);
-        setCardFront(true);
-      } else history.push('/');
-    }
-  }
+  useEffect(() => {
+    readDeck(deckId).then(setDeck);
+  }, [deckId]);
 
-  const BreadCrumbBar = () => {
-    return (
-      <div className="navigation  row-col">
-        <nav aria-label="breadcrumb">
-          <ol className="breadcrumb">
-            <li className="breadcrumb-item" key="0">
-              <Link to="/">
-                <span className="oi oi-home" /> Home
-              </Link>
-            </li>
-            <li className="breadcrumb-item" key="1">
-              <Link to={`/decks/${deckId}`}>{deck.name}</Link>
-            </li>
-            <li className="breadcrumb-item active" aria-current="page" key="2">
-              Study
-            </li>
-          </ol>
-        </nav>
-      </div>
-    );
+  const cardCount = deck.cards.length;
+
+  const nextHandler = () => {
+    if (cardNumber === cardCount) {
+      const returnToHomePage = !window.confirm(
+        "Restart cards?\n\nClick 'cancel' to return to the home page."
+      );
+      return returnToHomePage ? history.push('/') : setCardNumber(1);
+    }
+    setCardNumber((prevState) => Math.min(cardCount, prevState + 1));
   };
 
-  if (cards.length > 2) {
+  const cardTitle = `Card ${cardNumber} of ${cardCount}`;
+
+  const card = deck.cards[cardNumber - 1];
+
+  if (cardCount <= 2) {
     return (
-      <div>
-        <BreadCrumbBar />
-        <h2>Study: {deck.name}</h2>
-        <div className="card">
-          <div className="card-body">
-            <h5 className="card-title">
-              Card {cardAmount + 1} of {cards.length}
-            </h5>
-            <p className="card-text">
-              {cardFront
-                ? `${cards[cardAmount].front}`
-                : `${cards[cardAmount].back}`}
-            </p>
-            <button className="btn btn-secondary" onClick={cardFlip}>
-              Flip
-            </button>{' '}
-            &nbsp;
-            {cardFront ? (
-              ' '
-            ) : (
-              <button className="btn btn-primary" onClick={cardSwitch}>
-                Next
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      <StudyView name={deck.name} deckId={deckId}>
+        <h2>Not enough cards.</h2>
+        <p>
+          You need at least 3 cards to study. There are {cardCount} cards in
+          this deck.
+        </p>
+        <Link to={`/decks/${deckId}/cards/new`} className="btn btn-primary">
+          <span className="oi oi-plus" /> Add Cards
+        </Link>
+      </StudyView>
     );
   }
+
   return (
-    <div>
-      <BreadCrumbBar />
-      <h2>Study: {deck.name}</h2>
-      <div className="card border-danger">
-        <div className="card-body text-danger">
-          <h5 className="card-title">Not Enough Cards.</h5>
-          <p className="card-text">
-            You need at least 3 cards to study. There are {cards.length} cards
-            in this deck.
-          </p>
-          <Link to={`/decks/${deckId}/cards/new`} className="btn btn-primary">
-            <span className="oi oi-plus" /> Add Cards
-          </Link>
-        </div>
-      </div>
-    </div>
+    <StudyView name={deck.name} deckId={deckId}>
+      <FlipCard card={card} title={cardTitle}>
+        <button type="button" className="btn btn-primary" onClick={nextHandler}>
+          Next
+        </button>
+      </FlipCard>
+    </StudyView>
   );
 }
+
 export default Study;

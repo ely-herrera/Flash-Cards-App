@@ -1,54 +1,87 @@
-import React from 'react';
-import { Link, useRouteMatch, useHistory } from 'react-router-dom';
-import { deleteDeck } from '../../utils/api/index';
+import React, { useEffect, useState } from 'react';
+import { readDeck, deleteCard, deleteDeck } from '../../utils/api';
+import { Link, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import ListCards from '../Cards/ListCards';
 
-function Deck({ deck }) {
-  const { url, path } = useRouteMatch();
+// import CardList from "../../Card/List";
+
+// The screen includes the deck name (e.g., "React Router") and deck description
+
+// | "Edit"         | Edit Deck Screen |
+// Each card in the deck:
+// is listed on the page under the "Cards" heading.
+// shows a question and the answer to the question.
+// has an “Edit” button that takes the user to the Edit Card screen when clicked.
+
+// You can use window.confirm() to create the modal dialog shown in the screenshot below.
+
+function Deck() {
+  // The path to this screen should include the deckId (i.e., /decks/:deckId).
+  const { deckId } = useParams();
+  const [deck, setDeck] = useState({ cards: [] });
+
   const history = useHistory();
 
-  function deleteHandler(deckId) {
+  useEffect(loadDeck, [deckId]);
+
+  function loadDeck() {
+    readDeck(deckId).then(setDeck);
+  }
+
+  function handleDelete() {
     const confirmed = window.confirm(
-      'Delete this deck?\n\nYou will not be able to recover it.'
+      'Deleted data cannot be recovered, do you want to continue?'
+    );
+
+    if (confirmed) {
+      deleteDeck(deck.id).then(() => history.push('/decks/new'));
+    }
+  }
+
+  function deleteOneCard(cardId) {
+    const confirmed = window.confirm(
+      'Deleted cards cannot be recovered, do you want to continue?'
     );
     if (confirmed) {
-      deleteDeck(deckId).then(() => {
-        if (url === `/decks/${deck.id}`) {
-          history.push('/');
-        }
-      });
+      deleteCard(cardId).then(loadDeck);
     }
   }
 
   return (
-    <div className="container border border-secondary p-2 mt-2">
-      <h2>{deck.name}</h2>
-      {url === '/' ? <p>{deck.cards?.length} cards</p> : null}
-      <p>{deck.description}</p>
-
-      {url === '/' ? (
-        <Link to={`/decks/${deck.id}`} className="btn btn-secondary">
-          View
-        </Link>
-      ) : (
-        <Link
-          to={`/decks/${deck.id}/edit`}
-          className="btn          btn-secondary"
-        >
-          Edit
-        </Link>
-      )}
-      <Link to={`/decks/${deck.id}/study`} className="btn btn-primary">
-        Study
+    <>
+      <nav aria-label="breadcrumb">
+        <ol className="breadcrumb">
+          <li className="breadcrumb-item">
+            <a href="/">Home</a>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">
+            {deck.name}
+          </li>
+        </ol>
+      </nav>
+      <div className="media mb-2">
+        <div className="media-body">
+          <h5 className="mt-0">{deck.name}</h5>
+          {deck.description}
+        </div>
+      </div>
+      {/*The screen includes "Edit", "Study", "Add Cards", and "Delete" buttons.  */}
+      <Link to={`/decks/${deck.id}/edit`}>
+        <button className="btn btn-secondary mr-2">Edit</button>
       </Link>
-      {path === '/decks/:deckId' && (
-        <Link to={`/decks/${deck.id}/cards/new`} className="btn btn-primary">
-          Add Card
-        </Link>
-      )}
-      <button className="btn btn-danger" onClick={() => deleteHandler(deck.id)}>
-        <span className="oi oi-trash" />
+      <Link to={`/decks/${deck.id}/study`}>
+        <button className="btn btn-primary mr-2">Study</button>
+      </Link>
+      <Link to={`/decks/${deck.id}/cards/new`}>
+        <button className="btn btn-primary mr-2">Add Cards</button>
+      </Link>
+      <button onClick={handleDelete} className="btn btn-danger float-right">
+        Delete
       </button>
-    </div>
+      <ListCards deck={deck} deleteOneCard={deleteOneCard} />
+    </>
   );
 }
+
 export default Deck;

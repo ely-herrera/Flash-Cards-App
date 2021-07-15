@@ -1,59 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { deleteDeck } from '../utils/api';
-import { Link, useRouteMatch } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { listDecks } from '../utils/api';
+//put listCards on the above
+import { Link } from 'react-router-dom';
+import DeckInfo from '../Layout/Decks/DeckInfo';
 
-function Home({ decks }) {
-  // async function handleDelete(id) {
-  //   const msgConfirmation = window.confirm(
-  //     'Are you sure you want to delete this deck? You will not be able to recover it'
-  //   );
+/**
+ * Get decks, display all cards, and study a deck.
+ */
+function Home() {
+  const [decks, setDecks] = useState([]);
 
-  //   if (msgConfirmation) {
-  //     await deleteDeck(id);
-  //     setDecks((deck) => deck.filter((decks) => decks.id !== id));
-  //   }
-  // }
+  // For alternative to prop drilling - https://reactjs.org/docs/hooks-reference.html
+  /**
+   * PROP DRILLING EXAMPLE:
+   Parent - 
+    Child - ParentData (unused)
+      Child - GrandParentData (used)
+  **/
 
-  const deckList = decks.map(({ name, description, cards, id }) => (
-    <section key={id} className="card ">
-      <div className="card-body">
-        <div className="row">
-          <h5 className="card-title col-10">{name}</h5>
-          <p className="col-2 ">{cards.length} cards</p>
-        </div>
-        <p className="card-text">{description}</p>
-        <div className="row">
-          <div className="col-10">
-            <Link to={`decks/${id}`} className="btn btn-secondary">
-              <span className="oi oi-eye" /> View
-            </Link>
-            <Link to={`decks/${id}/study`}>
-              <button className="btn btn-primary mx-2">
-                <span className="oi oi-book" /> Study
-              </button>
-            </Link>
-          </div>
-          <div className="col-2">
-            <button
-              className="btn btn-danger mx-2 text"
-              // onClick={() => handleDelete(id)}
-            >
-              <span className="oi oi-trash" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  ));
+  useEffect(() => {
+    async function loadDeck() {
+      const deckData = await listDecks();
+      // const cardData = await listCards(1);
+      setDecks(deckData);
+      // setCards(cardData);
+    }
+    loadDeck();
+  }, []);
 
   return (
-    <main>
-      <Link to="/decks/new" className="btn btn-secondary m-2 text">
-        <span className="oi oi-plus m-1" />
-        Create Deck
+    <>
+      {/* A "Create Deck" Link is shown and clicking it brings the user to the Create Deck screen. */}
+      <Link to="/decks/new" className="btn btn-secondary mb-2">
+        <span className="oi oi-plus mr-2" />
+        Create New Deck
       </Link>
-      {deckList}
-    </main>
+      <ul className="list-group">
+        {decks.map((deck) => (
+          // The path to this screen should include the deckId (i.e., /decks/:deckId).
+          <DeckInfo key={deck.id} deck={deck} setDecks={setDecks} />
+        ))}
+      </ul>
+    </>
   );
 }
 

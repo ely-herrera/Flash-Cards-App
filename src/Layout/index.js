@@ -1,40 +1,40 @@
 import React from 'react';
 import Header from './Header';
 import NotFound from './NotFound';
-import ListDeck from './Decks/ListDeck';
-import DeckForm from './Decks/DeckForm';
-import DeckInfo from './Decks/DeckInfo';
-import { Switch, Route, Link } from 'react-router-dom';
-
+import Home from '../Home';
+import { Switch, Route } from 'react-router-dom';
+import CreateDeck from './Decks/CreateDeck';
+import Deck from './Decks/Deck';
+import EditDeck from './Decks/EditDeck';
+import EditCard from './Cards/EditCard';
+import AddCard from './Cards/AddCard';
+import Study from '../Study';
 function Layout() {
-  const initialDeckForm = {
-    title: 'Deck Name',
-    inputTitle: 'Name',
-    inputDescript: 'Description',
-    submitType: 'newDeck',
-  };
-
   return (
     <>
       <Header />
       <div className="container">
         <Switch>
           <Route exact path="/">
-            <ListDeck />
+            <Home />
           </Route>
           <Route exact path="/decks/new">
-            <nav>
-              <ol className="breadcrumb">
-                <li className="breadcrumb-item">
-                  <Link to="/">Home</Link>
-                </li>
-                <li className="breadcrumb-item active">Create Deck</li>
-              </ol>
-            </nav>
-            <DeckForm formProps={initialDeckForm} />
+            <CreateDeck />
           </Route>
-          <Route path="/decks/:deckId">
-            <DeckInfo />
+          <Route exact path="/decks/:deckId">
+            <Deck />
+          </Route>
+          <Route path="/decks/:deckId/edit">
+            <EditDeck />
+          </Route>
+          <Route path="/decks/:deckId/cards/:cardId/edit">
+            <EditCard />
+          </Route>
+          <Route path="/decks/:deckId/study">
+            <Study />
+          </Route>
+          <Route path="/decks/:deckId/cards/new">
+            <AddCard />
           </Route>
           <Route>
             <NotFound />
