@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { createDeck } from '../../utils/api';
 
-// The path to this screen should be /decks/news
 function CreateDeck() {
   const history = useHistory();
 
@@ -20,7 +19,6 @@ function CreateDeck() {
     }));
   };
 
-  // If the user clicks "submit", the user is taken to the Deck screen.
   function clickSubmit(decks) {
     createDeck(decks).then((savedDeck) =>
       history.push(`/decks/${savedDeck.id}`)
@@ -29,13 +27,11 @@ function CreateDeck() {
 
   function handleSubmit(event) {
     event.preventDefault();
-    // event.stopPropagation();
     clickSubmit(deck);
   }
 
   return (
     <>
-      {/*There is a breadcrumb navigation bar with a link to home / followed by the text Create Deck (i.e., Home/Create Deck). */}
       <nav aria-label="breadcrumb">
         <ol className="breadcrumb">
           <li className="breadcrumb-item">
@@ -47,10 +43,8 @@ function CreateDeck() {
         </ol>
       </nav>
       <h1> Create a New Deck </h1>
-      {/* A form is shown with the appropriate fields for creating a new deck. */}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          {/* The name field is an <input> field of type text. */}
           <label htmlFor="name" className="form-group">
             Deck Name:
           </label>
@@ -67,7 +61,6 @@ function CreateDeck() {
 
           <p></p>
           <label className="form-group">Description</label>
-          {/* The description field is a <textarea> field that can be multiple lines of text. */}
           <textarea
             id="description"
             type="text"
@@ -79,7 +72,6 @@ function CreateDeck() {
           ></textarea>
 
           <p></p>
-          {/*  If the user clicks "cancel", the user is taken to the Home screen. */}
           <button
             className="btn btn-secondary mr-2"
             onClick={() => history.push('/')}

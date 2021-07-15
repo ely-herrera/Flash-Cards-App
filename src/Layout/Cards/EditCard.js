@@ -2,11 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import { readDeck, readCard, updateCard } from '../../utils/api';
 
-//Additionally, you must use the readCard() function from src/utils/api/index.js to load the card that you want to edit.
-// There is a breadcrumb nav bar with a link to home /, then name of the deck of the card,and finally the text Edit Card :cardId
-// It displays the same form as the Add Card screen, except it is pre-filled with information for the existing card. It can be edited and updated.
-// If the user clicks on either "Save" or "Cancel", the user is taken to the Deck screen.
-
 function EditCard() {
   const { deckId, cardId } = useParams();
   const [card, setCard] = useState({ front: '', back: '' });
@@ -73,14 +68,12 @@ function EditCard() {
           placeholder="back side of card"
           class="form-control"
         ></textarea>
-        {/* If the user clicks "Done", the user is taken to the Deck screen. */}
         <button
           onClick={() => history.push(`/decks/${deckId}`)}
           className="btn btn-secondary mr-2"
         >
           Done
         </button>
-        {/* If the user clicks "Save", new card is created and put in relevant deck. Then the form is cleared and the process for adding a card is restarted. */}
         <button className="btn btn-primary">Save</button>
       </form>
     </>

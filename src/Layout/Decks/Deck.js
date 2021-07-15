@@ -4,20 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import ListCards from '../Cards/ListCards';
 
-// import CardList from "../../Card/List";
-
-// The screen includes the deck name (e.g., "React Router") and deck description
-
-// | "Edit"         | Edit Deck Screen |
-// Each card in the deck:
-// is listed on the page under the "Cards" heading.
-// shows a question and the answer to the question.
-// has an “Edit” button that takes the user to the Edit Card screen when clicked.
-
-// You can use window.confirm() to create the modal dialog shown in the screenshot below.
-
 function Deck() {
-  // The path to this screen should include the deckId (i.e., /decks/:deckId).
   const { deckId } = useParams();
   const [deck, setDeck] = useState({ cards: [] });
 
@@ -66,7 +53,6 @@ function Deck() {
           {deck.description}
         </div>
       </div>
-      {/*The screen includes "Edit", "Study", "Add Cards", and "Delete" buttons.  */}
       <Link to={`/decks/${deck.id}/edit`}>
         <button className="btn btn-secondary mr-2">Edit</button>
       </Link>
